@@ -3,16 +3,29 @@ project:
   output-dir: docs
 
 website:
-  title: "my-science-blog"
+  title: "Notes"
   navbar:
     right:
-      - about.qmd
+      - text: "About"
+        file: about.qmd
+
 format:
   html:
-    theme:
-      - cosmo
-      - brand
-    css: styles.css
+    theme: default
+    toc: true
+    code-fold: false
+    math:
+      method: katex
+    number-sections: true
+    numbering: true
+    fig-cap-location: top
+    tbl-cap-location: top
+    css: custom-styles.css
 
-
-
+# ---------- key section ----------
+execute:
+  engine: jupyter             # <−− tell Quarto to use Jupyter
+  jupyter: python3            #     and the python3 kernel
+  echo: true                  # show code
+  eval: true                  # run code
+# ---------------------------------

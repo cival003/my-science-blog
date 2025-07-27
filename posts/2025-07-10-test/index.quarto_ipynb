@@ -1,0 +1,176 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Test Page\"\n",
+        "author: Simone\n",
+        "date: 2025-07-10\n",
+        "categories: [Test]\n",
+        "description: \"Test Page\"\n",
+        "---\n",
+        "\n",
+        "## Equations\n",
+        "### Subtitle\n",
+        "#### Sub-Subtitle\n",
+        "\n",
+        "Test page including equations:\n",
+        "$$\n",
+        "\\hat{\\Delta} = \\bar Y_T - \\bar Y_C .\n",
+        "$$\n",
+        "\n",
+        "\n",
+        "## Markdows\n",
+        "\n",
+        "\n",
+        "```{markdown}\n",
+        "import statsmodels.api as sm\n",
+        "X = sm.add_constant(df[[\"T\", \"age\", \"preY\"]])\n",
+        "model = sm.OLS(df[\"Y\"], X).fit(cov_type=\"HC3\")\n",
+        "model.summary()\n",
+        "```\n",
+        "\n",
+        "\n",
+        "## Code Rendering\n"
+      ],
+      "id": "389f264b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "x = np.random.normal(loc=0.0, scale=1.0, size=1000)\n",
+        "y = np.mean(x)\n",
+        "print(y)"
+      ],
+      "id": "e60fcbaa",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "print(np.var(x))"
+      ],
+      "id": "268201aa",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Table\n",
+        "\n",
+        "::: {#tbl-panel layout-ncol=2}\n",
+        "| Col1 | Col2 | Col3 |\n",
+        "|------|------|------|\n",
+        "| A    | B    | C    |\n",
+        "| E    | F    | G    |\n",
+        "| A    | G    | G    |\n",
+        "\n",
+        ": First Panel {#tbl-first}\n",
+        "\n",
+        "| Col1 | Col2 | Col3 |\n",
+        "|------|------|------|\n",
+        "| A    | B    | C    |\n",
+        "| E    | F    | G    |\n",
+        "\n",
+        ": Second Panel {#tbl-second}\n",
+        "\n",
+        "Table Title\n",
+        ":::\n",
+        "\n",
+        "::: {#tbl-test}\n",
+        "| Col1 | Col2 | Col3 |\n",
+        "|------|------|------|\n",
+        "| A    | B    | C    |\n",
+        "| E    | F    | G    |\n",
+        "| A    | G    | G    |\n",
+        ":::\n",
+        "\n",
+        "See @tbl-panel for details, especially @tbl-second.\n",
+        "\n",
+        "## Plot with Code\n"
+      ],
+      "id": "08146116"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| fig-cap: \"Fuel efficiency vs. horsepower by origin (with code)\"\n",
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "mpg = sns.load_dataset(\"mpg\").dropna()\n",
+        "sns.scatterplot(\n",
+        "    data=mpg,\n",
+        "    x=\"horsepower\",\n",
+        "    y=\"mpg\",\n",
+        "    hue=\"origin\",\n",
+        "    s=40,\n",
+        "    alpha=0.8,\n",
+        "    palette=\"Dark2\"\n",
+        ")\n",
+        "plt.xlabel(\"Horsepower\")\n",
+        "plt.ylabel(\"Miles per gallon\")\n",
+        "plt.title(\"Fuel efficiency vs. horsepower\")\n",
+        "plt.tight_layout()"
+      ],
+      "id": "754c26a1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Plot without Source Code\n"
+      ],
+      "id": "c2d67f95"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: fig-efficiency\n",
+        "#| fig-cap: Fuel efficiency vs. horsepower by origin\n",
+        "#| echo: false\n",
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "mpg = sns.load_dataset(\"mpg\").dropna()\n",
+        "sns.scatterplot(\n",
+        "    data=mpg,\n",
+        "    x=\"horsepower\",\n",
+        "    y=\"mpg\",\n",
+        "    hue=\"origin\",\n",
+        "    s=40,\n",
+        "    alpha=0.8,\n",
+        "    palette=\"Dark2\"\n",
+        ")\n",
+        "plt.xlabel(\"Horsepower\")\n",
+        "plt.ylabel(\"Miles per gallon\")\n",
+        "plt.title(\"Fuel efficiency vs. horsepower\")\n",
+        "plt.tight_layout()"
+      ],
+      "id": "fig-efficiency",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/civales/.local/share/mise/installs/python/3.12.8/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Simone">
+<meta name="dcterms.date" content="2025-07-13">
+<meta name="description" content="Practical guide to choosing and interpreting standard error methods in RCTs: Neyman, HC3, cluster-robust, bootstrap, and randomisation inference. Includes code, guidance, and when to use each approach.">
+
+<title>RCT Standard Errors – Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dd755132419e67449ef99e0994c660a4.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8d8f5bec5c843bc310a1aecaed10e6e3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom-styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Notes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup"><span class="header-section-number">1</span> Setup</a></li>
+  <li><a href="#neyman-analytical-standard-error" id="toc-neyman-analytical-standard-error" class="nav-link" data-scroll-target="#neyman-analytical-standard-error"><span class="header-section-number">2</span> Neyman analytical standard error</a></li>
+  <li><a href="#ols-with-hc2hc3-robust" id="toc-ols-with-hc2hc3-robust" class="nav-link" data-scroll-target="#ols-with-hc2hc3-robust"><span class="header-section-number">3</span> OLS with HC2/HC3 (“robust”)</a></li>
+  <li><a href="#cluster-robust-standard-errors" id="toc-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#cluster-robust-standard-errors"><span class="header-section-number">4</span> Cluster-robust standard errors</a></li>
+  <li><a href="#bootstrap" id="toc-bootstrap" class="nav-link" data-scroll-target="#bootstrap"><span class="header-section-number">5</span> Bootstrap</a>
+  <ul class="collapse">
+  <li><a href="#simple-bootstrap" id="toc-simple-bootstrap" class="nav-link" data-scroll-target="#simple-bootstrap"><span class="header-section-number">5.1</span> Simple bootstrap</a></li>
+  <li><a href="#cluster-bootstrap" id="toc-cluster-bootstrap" class="nav-link" data-scroll-target="#cluster-bootstrap"><span class="header-section-number">5.2</span> Cluster bootstrap</a></li>
+  </ul></li>
+  <li><a href="#randomisation-inference" id="toc-randomisation-inference" class="nav-link" data-scroll-target="#randomisation-inference"><span class="header-section-number">6</span> Randomisation inference</a></li>
+  <li><a href="#bayesian-estimates-of-standard-error" id="toc-bayesian-estimates-of-standard-error" class="nav-link" data-scroll-target="#bayesian-estimates-of-standard-error"><span class="header-section-number">7</span> Bayesian Estimates of Standard Error</a></li>
+  <li><a href="#summary-of-standard-error-and-inference-methods" id="toc-summary-of-standard-error-and-inference-methods" class="nav-link" data-scroll-target="#summary-of-standard-error-and-inference-methods"><span class="header-section-number">8</span> Summary of Standard Error and Inference Methods</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">RCT Standard Errors</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">RCT</div>
+    <div class="quarto-category">Standard Errors</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Practical guide to choosing and interpreting standard error methods in RCTs: Neyman, HC3, cluster-robust, bootstrap, and randomisation inference. Includes code, guidance, and when to use each approach.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Simone </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 13, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="setup" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="setup"><span class="header-section-number">1</span> Setup</h2>
+<ul>
+<li>Two-arm RCT with <span class="math inline">\(n_T\)</span> treated and <span class="math inline">\(n_C\)</span> control units.<br>
+</li>
+<li>Let <span class="math inline">\(\bar Y_T,\; s_T^{2}\)</span> and <span class="math inline">\(\bar Y_C,\; s_C^{2}\)</span> denote sample means and variances.<br>
+</li>
+<li>The estimated effect is <span class="math inline">\(\hat{\Delta} = \bar Y_T - \bar Y_C .\)</span></li>
+</ul>
+<div id="805a2fbc" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.utils <span class="im">import</span> resample</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>n_T <span class="op">=</span> n_C <span class="op">=</span> n <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate covariate and outcome</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'T'</span>: np.repeat([<span class="dv">1</span>, <span class="dv">0</span>], [n_T, n_C]),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'age'</span>: np.random.normal(<span class="dv">50</span>, <span class="dv">10</span>, n),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'preY'</span>: np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, n)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Y'</span>] <span class="op">=</span> <span class="dv">2</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> df[<span class="st">'T'</span>] <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> df[<span class="st">'age'</span>] <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> df[<span class="st">'preY'</span>] <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">2</span>, n)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'school_id'</span>] <span class="op">=</span> np.random.choice([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>], size<span class="op">=</span>n)  <span class="co"># for clustering</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="50e4249b" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Y_T <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Y'</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Y_C <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">0</span>, <span class="st">'Y'</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mean_T <span class="op">=</span> Y_T.mean()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>mean_C <span class="op">=</span> Y_C.mean()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>var_T <span class="op">=</span> Y_T.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>var_C <span class="op">=</span> Y_C.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>delta_hat <span class="op">=</span> mean_T <span class="op">-</span> mean_C</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean (Treated): </span><span class="sc">{</span>mean_T<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean (Control): </span><span class="sc">{</span>mean_C<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variance (Treated): </span><span class="sc">{</span>var_T<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variance (Control): </span><span class="sc">{</span>var_C<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Estimated Effect (Delta): </span><span class="sc">{</span>delta_hat<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean (Treated): 27.921
+Mean (Control): 26.966
+Variance (Treated): 24.378
+Variance (Control): 24.434
+Estimated Effect (Delta): 0.954</code></pre>
+</div>
+</div>
+</section>
+<section id="neyman-analytical-standard-error" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="neyman-analytical-standard-error"><span class="header-section-number">2</span> Neyman analytical standard error</h2>
+<p><span class="math display">\[
+\widehat{\operatorname{Var}}_{\text{Neyman}}\!\bigl(\hat{\Delta}\bigr)
+  = \frac{s_T^{2}}{n_T} + \frac{s_C^{2}}{n_C}.
+\]</span></p>
+<ul>
+<li>Exact under simple random assignment. If the assignment is not simple random (e.g., clustered, stratified, or otherwise dependent), this formula may underestimate or misestimate the true variance.</li>
+<li>Ignores covariates; best for large, clean designs.</li>
+<li>In smaller samples, or if covariates are strongly related to the outcome, adjusting for covariates (e.g., via regression) can increase precision (reduce standard errors).</li>
+</ul>
+<div id="681461f1" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Y_T <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Y'</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Y_C <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">0</span>, <span class="st">'Y'</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>s2_T <span class="op">=</span> Y_T.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>s2_C <span class="op">=</span> Y_C.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>se_neyman <span class="op">=</span> np.sqrt(s2_T<span class="op">/</span>n_T <span class="op">+</span> s2_C<span class="op">/</span>n_C)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Neyman SE: </span><span class="sc">{</span>se_neyman<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Neyman SE: 0.699</code></pre>
+</div>
+</div>
+</section>
+<section id="ols-with-hc2hc3-robust" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="ols-with-hc2hc3-robust"><span class="header-section-number">3</span> OLS with HC2/HC3 (“robust”)</h2>
+<p>Run OLS of <span class="math inline">\(Y\)</span> on treatment <span class="math inline">\(T\)</span> and any baseline covariates <span class="math inline">\(X\)</span>; report <strong>HC3</strong> SEs.</p>
+<div id="34e7ee63" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(df[[<span class="st">'T'</span>, <span class="st">'age'</span>, <span class="st">'preY'</span>]])</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(df[<span class="st">'Y'</span>], X).fit(cov_type<span class="op">=</span><span class="st">'HC3'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>se_hc3 <span class="op">=</span> model.bse[<span class="st">'T'</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"OLS HC3 SE: </span><span class="sc">{</span>se_hc3<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS HC3 SE: 0.284</code></pre>
+</div>
+</div>
+<ul>
+<li>HC3 handles heteroskedasticity.</li>
+<li>Equals Neyman when the model is saturated (the regression only includes treatment (no covariates), robust SE = Neyman SE.)</li>
+</ul>
+<p>To show this second point, we fit a regression of <span class="math inline">\(Y\)</span> on <span class="math inline">\(T\)</span> only (no covariates), compute the robust (HC3) standard error for the treatment effect, and compare it to the Neyman standard error. The results below confirm that the two are equal:</p>
+<div id="058162f6" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS HC3 SE (T only): 0.702177
+Neyman SE: 0.698658
+Difference: 3.519708e-03</code></pre>
+</div>
+</div>
+</section>
+<section id="cluster-robust-standard-errors" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="cluster-robust-standard-errors"><span class="header-section-number">4</span> Cluster-robust standard errors</h2>
+<p>Needed when assignment or outcomes cluster (e.g., classrooms, markets).</p>
+<p>In terms of the model, clustering means that the error terms are correlated within groups (clusters):</p>
+<p><span class="math display">\[
+\operatorname{Cov}(\epsilon_{ij},\; \epsilon_{i'j}) &gt; 0
+\quad \text{for} \quad i \neq i', \text{ within the same cluster } j,
+\]</span></p>
+<p>That is, individuals in the same cluster share unobserved factors, so their errors are not independent.</p>
+<p><strong>Cluster-robust standard errors are usually larger than conventional (non-clustered) standard errors.</strong> When there is strong intra-cluster correlation, the estimated SEs can be much larger, reflecting the reduced effective sample size due to the similarity of outcomes within clusters.</p>
+<div id="4f1dce1f" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model_cluster <span class="op">=</span> sm.OLS(df[<span class="st">'Y'</span>], X).fit(cov_type<span class="op">=</span><span class="st">'cluster'</span>, cov_kwds<span class="op">=</span>{<span class="st">'groups'</span>: df[<span class="st">'school_id'</span>]})</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>se_cluster <span class="op">=</span> model_cluster.bse[<span class="st">'T'</span>]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cluster-robust SE: </span><span class="sc">{</span>se_cluster<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cluster-robust SE: 0.304</code></pre>
+</div>
+</div>
+</section>
+<section id="bootstrap" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="bootstrap"><span class="header-section-number">5</span> Bootstrap</h2>
+<section id="simple-bootstrap" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="simple-bootstrap"><span class="header-section-number">5.1</span> Simple bootstrap</h3>
+<p>Resample individuals with replacement; compute <span class="math inline">\(\hat{\Delta}\)</span> each time; use the empirical standard deviation.</p>
+<div id="d77a4364" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap for regression SE</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>boot_ests_reg <span class="op">=</span> []</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap for simple difference in means</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>boot_ests_diff <span class="op">=</span> []</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    boot <span class="op">=</span> resample(df)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Regression bootstrap</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    Xb <span class="op">=</span> sm.add_constant(boot[[<span class="st">'T'</span>, <span class="st">'age'</span>, <span class="st">'preY'</span>]])</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    mb <span class="op">=</span> sm.OLS(boot[<span class="st">'Y'</span>], Xb).fit()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    boot_ests_reg.append(mb.params[<span class="st">'T'</span>])</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simple difference in means bootstrap</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    Y_Tb <span class="op">=</span> boot.loc[boot[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Y'</span>]</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    Y_Cb <span class="op">=</span> boot.loc[boot[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">0</span>, <span class="st">'Y'</span>]</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    boot_ests_diff.append(Y_Tb.mean() <span class="op">-</span> Y_Cb.mean())</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>se_boot_reg <span class="op">=</span> np.std(boot_ests_reg, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>se_boot_diff <span class="op">=</span> np.std(boot_ests_diff, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bootstrap SE (regression): </span><span class="sc">{</span>se_boot_reg<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bootstrap SE (difference in means): </span><span class="sc">{</span>se_boot_diff<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrap SE (regression): 0.284
+Bootstrap SE (difference in means): 0.692</code></pre>
+</div>
+</div>
+</section>
+<section id="cluster-bootstrap" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="cluster-bootstrap"><span class="header-section-number">5.2</span> Cluster bootstrap</h3>
+<p>Resample clusters to respect dependence.</p>
+<div id="6d044000" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>n_boot <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_ests_cluster_reg <span class="op">=</span> []  <span class="co"># Regression-based</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>boot_ests_cluster_diff <span class="op">=</span> []  <span class="co"># Difference in means</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>clusters <span class="op">=</span> df[<span class="st">'school_id'</span>].unique()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_boot):</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    sampled_clusters <span class="op">=</span> np.random.choice(clusters, size<span class="op">=</span><span class="bu">len</span>(clusters), replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    boot <span class="op">=</span> pd.concat([df[df[<span class="st">'school_id'</span>] <span class="op">==</span> cid] <span class="cf">for</span> cid <span class="kw">in</span> sampled_clusters], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Regression-based cluster bootstrap</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    Xb <span class="op">=</span> sm.add_constant(boot[[<span class="st">'T'</span>, <span class="st">'age'</span>, <span class="st">'preY'</span>]])</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    mb <span class="op">=</span> sm.OLS(boot[<span class="st">'Y'</span>], Xb).fit()</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    boot_ests_cluster_reg.append(mb.params[<span class="st">'T'</span>])</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Difference in means cluster bootstrap</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    Y_Tb <span class="op">=</span> boot.loc[boot[<span class="st">'T'</span>] <span class="op">==</span> <span class="dv">1</span>, <span class="st">'Y'</span>]</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    Y_Cb <span class="op">=</span> boot.loc[boot[<span class="st">'T'</span>] <span class="op">==</span> <span class="dv">0</span>, <span class="st">'Y'</span>]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(Y_Tb) <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">len</span>(Y_Cb) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        boot_ests_cluster_diff.append(Y_Tb.mean() <span class="op">-</span> Y_Cb.mean())</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>se_boot_cluster_reg <span class="op">=</span> np.std(boot_ests_cluster_reg, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>se_boot_cluster_diff <span class="op">=</span> np.std(boot_ests_cluster_diff, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cluster bootstrap SE (regression): </span><span class="sc">{</span>se_boot_cluster_reg<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cluster bootstrap SE (difference in means): </span><span class="sc">{</span>se_boot_cluster_diff<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cluster bootstrap SE (regression): 0.259
+Cluster bootstrap SE (difference in means): 0.405</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="randomisation-inference" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="randomisation-inference"><span class="header-section-number">6</span> Randomisation inference</h2>
+<p>Randomisation inference is a nonparametric method that uses the known assignment mechanism of an experiment to test hypotheses. It is exact under the randomisation used, making no assumptions about outcome distributions.</p>
+<p>Under the null hypothesis (no treatment effect), outcomes would be equally likely under any possible assignment of treatment labels. Shuffle (permute) the treatment labels many times, each time calculating the test statistic (e.g., difference in means). The p-value is the proportion of shuffled assignments where the statistic is as extreme or more extreme than observed.</p>
+<p>This method provides exact p-values, even in small samples or with unusual outcome distributions. It is useful for non-standard estimands (like medians) or complex assignment mechanisms.</p>
+<div id="1793fabc" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Randomisation inference example: calculate p-value for treatment effect</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'Y'</span>].values</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> df[<span class="st">'T'</span>].values</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>obs <span class="op">=</span> np.mean(y[T<span class="op">==</span><span class="dv">1</span>]) <span class="op">-</span> np.mean(y[T<span class="op">==</span><span class="dv">0</span>])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>more_extreme <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(reps):</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    shuffled <span class="op">=</span> np.random.permutation(T)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    diff <span class="op">=</span> np.mean(y[shuffled<span class="op">==</span><span class="dv">1</span>]) <span class="op">-</span> np.mean(y[shuffled<span class="op">==</span><span class="dv">0</span>])</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(diff) <span class="op">&gt;=</span> <span class="bu">abs</span>(obs):</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        more_extreme <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>pval <span class="op">=</span> more_extreme <span class="op">/</span> reps</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Randomisation inference p-value: </span><span class="sc">{</span>pval<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Randomisation inference p-value: 0.1752</code></pre>
+</div>
+</div>
+</section>
+<section id="bayesian-estimates-of-standard-error" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="bayesian-estimates-of-standard-error"><span class="header-section-number">7</span> Bayesian Estimates of Standard Error</h2>
+<p>Bayesian methods provide an alternative approach to uncertainty quantification in RCTs by estimating the full posterior distribution of treatment effects, rather than relying solely on standard errors from frequentist estimators. In the Bayesian framework, uncertainty is typically summarized using <strong>credible intervals</strong> (e.g., the 95% credible interval), which represent the range within which the true effect lies with a specified probability, given the data and prior.</p>
+<p><strong>How it works:</strong> - Specify a likelihood for the data and a prior distribution for the parameters (e.g., treatment effect). - Use Bayes’ theorem to compute the posterior distribution of the treatment effect. - The standard deviation of the posterior distribution can be interpreted as a Bayesian analogue to the standard error. - The 95% credible interval is often reported instead of (or alongside) a standard error.</p>
+<p><strong>When to use:</strong> - When you want to incorporate prior information or beliefs about the treatment effect. - For small samples, complex models, or when the likelihood is not well-approximated by standard frequentist assumptions. - When you want a direct probabilistic interpretation of uncertainty (e.g., “there is a 95% probability the effect lies in this interval”).</p>
+<p><strong>Example (conceptual):</strong> - Fit a Bayesian regression model (e.g., using PyMC or Stan) for the treatment effect. - Summarize the posterior with its mean and standard deviation (Bayesian SE), and report the 95% credible interval.</p>
+<p><strong>Note:</strong> - Bayesian credible intervals and standard errors depend on the choice of prior and model specification. - In large samples with non-informative priors, Bayesian and frequentist intervals often agree.</p>
+</section>
+<section id="summary-of-standard-error-and-inference-methods" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="summary-of-standard-error-and-inference-methods"><span class="header-section-number">8</span> Summary of Standard Error and Inference Methods</h2>
+<p>Below is a summary of the main methods for estimating standard errors or p-values in RCT analysis, with their calculated values (from the code above) and guidance on when to use each. After running the code, copy the printed results into the table below.</p>
+<div id="6c0607c6" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-11-output-1.png" width="757" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 68%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Neyman analytical SE (diff means)</td>
+<td style="text-align: left;">Classic, large RCTs with simple randomisation; no covariates; outcomes i.i.d.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OLS HC3 robust SE (regression)</td>
+<td style="text-align: left;">Any RCT with covariates; robust to heteroskedasticity; default for most regression analyses</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OLS Cluster-robust SE (regression)</td>
+<td style="text-align: left;">Assignment or outcomes clustered (e.g., by school, clinic); regression with covariates</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bootstrap SE (diff means)</td>
+<td style="text-align: left;">Small samples; non-standard estimands (e.g., medians); minimal assumptions</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bootstrap SE (regression)</td>
+<td style="text-align: left;">Small samples; regression with covariates; non-standard estimands; minimal assumptions</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cluster bootstrap SE (diff means)</td>
+<td style="text-align: left;">Clustered data; small samples; non-standard estimands; minimal assumptions</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cluster bootstrap SE (regression)</td>
+<td style="text-align: left;">Clustered data; regression with covariates; robust to cluster structure and small samples</td>
+</tr>
+</tbody>
+</table>
+
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
