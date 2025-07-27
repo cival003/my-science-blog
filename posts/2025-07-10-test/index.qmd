@@ -4,6 +4,7 @@ author: Simone
 date: 2025-07-10
 categories: [Test]
 description: "Test Page"
+draft: true
 ---
 
 ## Equations

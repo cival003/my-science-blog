@@ -4,6 +4,7 @@ author: Simone
 date: 2025-07-13
 categories: [RCT, Standard Errors]
 description: "Practical guide to choosing and interpreting standard error methods in RCTs: Neyman, HC3, cluster-robust, bootstrap, and randomisation inference. Includes code, guidance, and when to use each approach."
+draft: false
 ---
 
 
@@ -323,4 +324,3 @@ plt.show()
 | Bootstrap SE (regression)                 | Small samples; regression with covariates; non-standard estimands; minimal assumptions        |
 | Cluster bootstrap SE (diff means)         | Clustered data; small samples; non-standard estimands; minimal assumptions                   |
 | Cluster bootstrap SE (regression)         | Clustered data; regression with covariates; robust to cluster structure and small samples     |
-

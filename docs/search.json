@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "I’m Simone, a senior economist focused on ad-measurement science.\nThis site collects short explainers, code-backed notes, and longer posts I publish publicly."
-  },
-  {
     "objectID": "posts/2025-07-13-rct-standard-errors/index.html",
     "href": "posts/2025-07-13-rct-standard-errors/index.html",
     "title": "RCT Standard Errors",
@@ -56,74 +49,11 @@
     "text": "6 Randomisation inference\nRandomisation inference is a nonparametric method that uses the known assignment mechanism of an experiment to test hypotheses. It is exact under the randomisation used, making no assumptions about outcome distributions.\nUnder the null hypothesis (no treatment effect), outcomes would be equally likely under any possible assignment of treatment labels. Shuffle (permute) the treatment labels many times, each time calculating the test statistic (e.g., difference in means). The p-value is the proportion of shuffled assignments where the statistic is as extreme or more extreme than observed.\nThis method provides exact p-values, even in small samples or with unusual outcome distributions. It is useful for non-standard estimands (like medians) or complex assignment mechanisms.\n\n# Randomisation inference example: calculate p-value for treatment effect\nnp.random.seed(42)\nreps = 5000\ny = df['Y'].values\nT = df['T'].values\nobs = np.mean(y[T==1]) - np.mean(y[T==0])\nmore_extreme = 0\nfor _ in range(reps):\n    shuffled = np.random.permutation(T)\n    diff = np.mean(y[shuffled==1]) - np.mean(y[shuffled==0])\n    if abs(diff) &gt;= abs(obs):\n        more_extreme += 1\npval = more_extreme / reps\nprint(f\"Randomisation inference p-value: {pval:.4f}\")\n\nRandomisation inference p-value: 0.1752"
   },
   {
-    "objectID": "posts/2025-07-13-rct-standard-errors/index.html#choosing-among-methods",
-    "href": "posts/2025-07-13-rct-standard-errors/index.html#choosing-among-methods",
+    "objectID": "posts/2025-07-13-rct-standard-errors/index.html#bayesian-estimates-of-standard-error",
+    "href": "posts/2025-07-13-rct-standard-errors/index.html#bayesian-estimates-of-standard-error",
     "title": "RCT Standard Errors",
-    "section": "7 Choosing among methods",
-    "text": "7 Choosing among methods\n\n\n\n\n\n\n\nSituation\nPreferred SE method\n\n\n\n\nLarge i.i.d. RCT\nNeyman or HC3\n\n\nHeteroskedastic outcomes\nHC3\n\n\nClustered assignment or outcomes\nCluster-robust\n\n\nSmall samples\nRandomisation inference\n\n\nNon-analytic estimators (e.g., quantiles)\nBootstrap"
-  },
-  {
-    "objectID": "posts/2025-07-13-rct-standard-errors/index.html#references",
-    "href": "posts/2025-07-13-rct-standard-errors/index.html#references",
-    "title": "RCT Standard Errors",
-    "section": "8 References",
-    "text": "8 References\n\nFreedman (2008) “On regression adjustments in experiments.”\n\nImbens & Rubin (2015) Causal Inference.\n\nAbadie, Athey, Imbens & Wooldridge (2023) “Sampling- vs design-based inference in experiments.”"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html",
-    "href": "posts/2025-07-10-test/index.html",
-    "title": "Test Page",
-    "section": "",
-    "text": "Test page including equations: \\[\n\\hat{\\Delta} = \\bar Y_T - \\bar Y_C .\n\\]"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#equations",
-    "href": "posts/2025-07-10-test/index.html#equations",
-    "title": "Test Page",
-    "section": "",
-    "text": "Test page including equations: \\[\n\\hat{\\Delta} = \\bar Y_T - \\bar Y_C .\n\\]"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#markdows",
-    "href": "posts/2025-07-10-test/index.html#markdows",
-    "title": "Test Page",
-    "section": "2 Markdows",
-    "text": "2 Markdows\nimport statsmodels.api as sm\nX = sm.add_constant(df[[\"T\", \"age\", \"preY\"]])\nmodel = sm.OLS(df[\"Y\"], X).fit(cov_type=\"HC3\")\nmodel.summary()"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#code-rendering",
-    "href": "posts/2025-07-10-test/index.html#code-rendering",
-    "title": "Test Page",
-    "section": "3 Code Rendering",
-    "text": "3 Code Rendering\n\nimport numpy as np\nimport pandas as pd\nx = np.random.normal(loc=0.0, scale=1.0, size=1000)\ny = np.mean(x)\nprint(y)\n\n-0.08205250312560684\n\n\n\nprint(np.var(x))\n\n1.0108573440815711"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#table",
-    "href": "posts/2025-07-10-test/index.html#table",
-    "title": "Test Page",
-    "section": "4 Table",
-    "text": "4 Table\n\n\n\nTable 1: Table Title\n\n\n\n\n\n\n\n(a) First Panel\n\n\n\n\n\nCol1\nCol2\nCol3\n\n\n\n\nA\nB\nC\n\n\nE\nF\nG\n\n\nA\nG\nG\n\n\n\n\n\n\n\n\n\n\n\n(b) Second Panel\n\n\n\n\n\nCol1\nCol2\nCol3\n\n\n\n\nA\nB\nC\n\n\nE\nF\nG\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTable 2\n\n\n\n\n\nCol1\nCol2\nCol3\n\n\n\n\nA\nB\nC\n\n\nE\nF\nG\n\n\nA\nG\nG\n\n\n\n\n\n\nSee Table 1 for details, especially Table 1 (b)."
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#plot-with-code",
-    "href": "posts/2025-07-10-test/index.html#plot-with-code",
-    "title": "Test Page",
-    "section": "5 Plot with Code",
-    "text": "5 Plot with Code\n\nimport seaborn as sns\nimport matplotlib.pyplot as plt\nmpg = sns.load_dataset(\"mpg\").dropna()\nsns.scatterplot(\n    data=mpg,\n    x=\"horsepower\",\n    y=\"mpg\",\n    hue=\"origin\",\n    s=40,\n    alpha=0.8,\n    palette=\"Dark2\"\n)\nplt.xlabel(\"Horsepower\")\nplt.ylabel(\"Miles per gallon\")\nplt.title(\"Fuel efficiency vs. horsepower\")\nplt.tight_layout()\n\n\n\nFuel efficiency vs. horsepower by origin (with code)"
-  },
-  {
-    "objectID": "posts/2025-07-10-test/index.html#plot-without-source-code",
-    "href": "posts/2025-07-10-test/index.html#plot-without-source-code",
-    "title": "Test Page",
-    "section": "6 Plot without Source Code",
-    "text": "6 Plot without Source Code\n\n\n\n\n\nFigure 1: Fuel efficiency vs. horsepower by origin"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Notes",
-    "section": "",
-    "text": "RCT Standard Errors\n\n\n\nRCT\n\nStandard Errors\n\n\n\nPractical guide to choosing and interpreting standard error methods in RCTs: Neyman, HC3, cluster-robust, bootstrap, and randomisation inference. Includes code, guidance, and when to use each approach.\n\n\n\n\n\nJul 13, 2025\n\n\nSimone\n\n\n\n\n\n\n\n\n\n\n\n\nTest Page\n\n\n\nTest\n\n\n\nTest Page\n\n\n\n\n\nJul 10, 2025\n\n\nSimone\n\n\n\n\n\nNo matching items"
+    "section": "7 Bayesian Estimates of Standard Error",
+    "text": "7 Bayesian Estimates of Standard Error\nBayesian methods provide an alternative approach to uncertainty quantification in RCTs by estimating the full posterior distribution of treatment effects, rather than relying solely on standard errors from frequentist estimators. In the Bayesian framework, uncertainty is typically summarized using credible intervals (e.g., the 95% credible interval), which represent the range within which the true effect lies with a specified probability, given the data and prior.\nHow it works: - Specify a likelihood for the data and a prior distribution for the parameters (e.g., treatment effect). - Use Bayes’ theorem to compute the posterior distribution of the treatment effect. - The standard deviation of the posterior distribution can be interpreted as a Bayesian analogue to the standard error. - The 95% credible interval is often reported instead of (or alongside) a standard error.\nWhen to use: - When you want to incorporate prior information or beliefs about the treatment effect. - For small samples, complex models, or when the likelihood is not well-approximated by standard frequentist assumptions. - When you want a direct probabilistic interpretation of uncertainty (e.g., “there is a 95% probability the effect lies in this interval”).\nExample (conceptual): - Fit a Bayesian regression model (e.g., using PyMC or Stan) for the treatment effect. - Summarize the posterior with its mean and standard deviation (Bayesian SE), and report the 95% credible interval.\nNote: - Bayesian credible intervals and standard errors depend on the choice of prior and model specification. - In large samples with non-informative priors, Bayesian and frequentist intervals often agree."
   },
   {
     "objectID": "posts/2025-07-13-rct-standard-errors/index.html#summary-of-standard-error-and-inference-methods",
@@ -131,12 +61,5 @@
     "title": "RCT Standard Errors",
     "section": "8 Summary of Standard Error and Inference Methods",
     "text": "8 Summary of Standard Error and Inference Methods\nBelow is a summary of the main methods for estimating standard errors or p-values in RCT analysis, with their calculated values (from the code above) and guidance on when to use each. After running the code, copy the printed results into the table below.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nMethod\nWhen to Use\n\n\n\n\nNeyman analytical SE (diff means)\nClassic, large RCTs with simple randomisation; no covariates; outcomes i.i.d.\n\n\nOLS HC3 robust SE (regression)\nAny RCT with covariates; robust to heteroskedasticity; default for most regression analyses\n\n\nOLS Cluster-robust SE (regression)\nAssignment or outcomes clustered (e.g., by school, clinic); regression with covariates\n\n\nBootstrap SE (diff means)\nSmall samples; non-standard estimands (e.g., medians); minimal assumptions\n\n\nBootstrap SE (regression)\nSmall samples; regression with covariates; non-standard estimands; minimal assumptions\n\n\nCluster bootstrap SE (diff means)\nClustered data; small samples; non-standard estimands; minimal assumptions\n\n\nCluster bootstrap SE (regression)\nClustered data; regression with covariates; robust to cluster structure and small samples"
-  },
-  {
-    "objectID": "posts/2025-07-13-rct-standard-errors/index.html#bayesian-estimates-of-standard-error",
-    "href": "posts/2025-07-13-rct-standard-errors/index.html#bayesian-estimates-of-standard-error",
-    "title": "RCT Standard Errors",
-    "section": "7 Bayesian Estimates of Standard Error",
-    "text": "7 Bayesian Estimates of Standard Error\nBayesian methods provide an alternative approach to uncertainty quantification in RCTs by estimating the full posterior distribution of treatment effects, rather than relying solely on standard errors from frequentist estimators. In the Bayesian framework, uncertainty is typically summarized using credible intervals (e.g., the 95% credible interval), which represent the range within which the true effect lies with a specified probability, given the data and prior.\nHow it works: - Specify a likelihood for the data and a prior distribution for the parameters (e.g., treatment effect). - Use Bayes’ theorem to compute the posterior distribution of the treatment effect. - The standard deviation of the posterior distribution can be interpreted as a Bayesian analogue to the standard error. - The 95% credible interval is often reported instead of (or alongside) a standard error.\nWhen to use: - When you want to incorporate prior information or beliefs about the treatment effect. - For small samples, complex models, or when the likelihood is not well-approximated by standard frequentist assumptions. - When you want a direct probabilistic interpretation of uncertainty (e.g., “there is a 95% probability the effect lies in this interval”).\nExample (conceptual): - Fit a Bayesian regression model (e.g., using PyMC or Stan) for the treatment effect. - Summarize the posterior with its mean and standard deviation (Bayesian SE), and report the 95% credible interval.\nNote: - Bayesian credible intervals and standard errors depend on the choice of prior and model specification. - In large samples with non-informative priors, Bayesian and frequentist intervals often agree."
   }
 ]

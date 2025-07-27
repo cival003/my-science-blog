@@ -21,6 +21,7 @@ format:
     fig-cap-location: top
     tbl-cap-location: top
     css: custom-styles.css
+    draft: true
 
 # ---------- key section ----------
 execute:
