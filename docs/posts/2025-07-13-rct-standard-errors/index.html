@@ -159,6 +159,10 @@ window.Quarto = {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -242,7 +246,7 @@ window.Quarto = {
 </li>
 <li>The estimated effect is <span class="math inline">\(\hat{\Delta} = \bar Y_T - \bar Y_C .\)</span></li>
 </ul>
-<div id="71a9d754" class="cell" data-execution_count="1">
+<div id="466973c5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
@@ -260,7 +264,7 @@ window.Quarto = {
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Y'</span>] <span class="op">=</span> <span class="dv">2</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> df[<span class="st">'T'</span>] <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> df[<span class="st">'age'</span>] <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> df[<span class="st">'preY'</span>] <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">2</span>, n)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'school_id'</span>] <span class="op">=</span> np.random.choice([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>], size<span class="op">=</span>n)  <span class="co"># for clustering</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="481bba84" class="cell" data-execution_count="2">
+<div id="e1019639" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Y_T <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Y'</span>]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Y_C <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">0</span>, <span class="st">'Y'</span>]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mean_T <span class="op">=</span> Y_T.mean()</span>
@@ -293,7 +297,7 @@ Estimated Effect (Delta): 0.954</code></pre>
 <li>Ignores covariates; best for large, clean designs.</li>
 <li>In smaller samples, or if covariates are strongly related to the outcome, adjusting for covariates (e.g., via regression) can increase precision (reduce standard errors).</li>
 </ul>
-<div id="35b2484f" class="cell" data-execution_count="3">
+<div id="739eb638" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Y_T <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Y'</span>]</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Y_C <span class="op">=</span> df.loc[df[<span class="st">'T'</span>]<span class="op">==</span><span class="dv">0</span>, <span class="st">'Y'</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>s2_T <span class="op">=</span> Y_T.var(ddof<span class="op">=</span><span class="dv">1</span>)</span>
@@ -308,7 +312,7 @@ Estimated Effect (Delta): 0.954</code></pre>
 <section id="ols-with-hc2hc3-robust" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="ols-with-hc2hc3-robust"><span class="header-section-number">3</span> OLS with HC2/HC3 (“robust”)</h2>
 <p>Run OLS of <span class="math inline">\(Y\)</span> on treatment <span class="math inline">\(T\)</span> and any baseline covariates <span class="math inline">\(X\)</span>; report <strong>HC3</strong> SEs.</p>
-<div id="d13eea6f" class="cell" data-execution_count="4">
+<div id="100c7dde" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(df[[<span class="st">'T'</span>, <span class="st">'age'</span>, <span class="st">'preY'</span>]])</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(df[<span class="st">'Y'</span>], X).fit(cov_type<span class="op">=</span><span class="st">'HC3'</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>se_hc3 <span class="op">=</span> model.bse[<span class="st">'T'</span>]</span>
@@ -322,7 +326,7 @@ Estimated Effect (Delta): 0.954</code></pre>
 <li>Equals Neyman when the model is saturated (the regression only includes treatment (no covariates), robust SE = Neyman SE.)</li>
 </ul>
 <p>To show this second point, we fit a regression of <span class="math inline">\(Y\)</span> on <span class="math inline">\(T\)</span> only (no covariates), compute the robust (HC3) standard error for the treatment effect, and compare it to the Neyman standard error. The results below confirm that the two are equal:</p>
-<div id="85af8e3b" class="cell" data-execution_count="5">
+<div id="0359df8d" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-stdout">
 <pre><code>OLS HC3 SE (T only): 0.702177
 Neyman SE: 0.698658
@@ -340,7 +344,7 @@ Difference: 3.519708e-03</code></pre>
 \]</span></p>
 <p>That is, individuals in the same cluster share unobserved factors, so their errors are not independent.</p>
 <p><strong>Cluster-robust standard errors are usually larger than conventional (non-clustered) standard errors.</strong> When there is strong intra-cluster correlation, the estimated SEs can be much larger, reflecting the reduced effective sample size due to the similarity of outcomes within clusters.</p>
-<div id="58e3869e" class="cell" data-execution_count="6">
+<div id="754216d0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model_cluster <span class="op">=</span> sm.OLS(df[<span class="st">'Y'</span>], X).fit(cov_type<span class="op">=</span><span class="st">'cluster'</span>, cov_kwds<span class="op">=</span>{<span class="st">'groups'</span>: df[<span class="st">'school_id'</span>]})</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>se_cluster <span class="op">=</span> model_cluster.bse[<span class="st">'T'</span>]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cluster-robust SE: </span><span class="sc">{</span>se_cluster<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -354,7 +358,7 @@ Difference: 3.519708e-03</code></pre>
 <section id="simple-bootstrap" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="simple-bootstrap"><span class="header-section-number">5.1</span> Simple bootstrap</h3>
 <p>Resample individuals with replacement; compute <span class="math inline">\(\hat{\Delta}\)</span> each time; use the empirical standard deviation.</p>
-<div id="c4755cb6" class="cell" data-execution_count="7">
+<div id="ffe3a002" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap for regression SE</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>boot_ests_reg <span class="op">=</span> []</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap for simple difference in means</span></span>
@@ -382,7 +386,7 @@ Bootstrap SE (difference in means): 0.692</code></pre>
 <section id="cluster-bootstrap" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="cluster-bootstrap"><span class="header-section-number">5.2</span> Cluster bootstrap</h3>
 <p>Resample clusters to respect dependence.</p>
-<div id="54b07a7d" class="cell" data-execution_count="8">
+<div id="9ad5cab7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>n_boot <span class="op">=</span> <span class="dv">1000</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_ests_cluster_reg <span class="op">=</span> []  <span class="co"># Regression-based</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>boot_ests_cluster_diff <span class="op">=</span> []  <span class="co"># Difference in means</span></span>
@@ -415,7 +419,7 @@ Cluster bootstrap SE (difference in means): 0.405</code></pre>
 <p>Randomisation inference is a nonparametric method that uses the known assignment mechanism of an experiment to test hypotheses. It is exact under the randomisation used, making no assumptions about outcome distributions.</p>
 <p>Under the null hypothesis (no treatment effect), outcomes would be equally likely under any possible assignment of treatment labels. Shuffle (permute) the treatment labels many times, each time calculating the test statistic (e.g., difference in means). The p-value is the proportion of shuffled assignments where the statistic is as extreme or more extreme than observed.</p>
 <p>This method provides exact p-values, even in small samples or with unusual outcome distributions. It is useful for non-standard estimands (like medians) or complex assignment mechanisms.</p>
-<div id="3ffbb7c2" class="cell" data-execution_count="9">
+<div id="ea228745" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Randomisation inference example: calculate p-value for treatment effect</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> <span class="dv">5000</span></span>
@@ -446,7 +450,7 @@ Cluster bootstrap SE (difference in means): 0.405</code></pre>
 <section id="summary-of-standard-error-and-inference-methods" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="summary-of-standard-error-and-inference-methods"><span class="header-section-number">8</span> Summary of Standard Error and Inference Methods</h2>
 <p>Below is a summary of the main methods for estimating standard errors or p-values in RCT analysis, with their calculated values (from the code above) and guidance on when to use each. After running the code, copy the printed results into the table below.</p>
-<div id="c1a7b4f4" class="cell" data-execution_count="10">
+<div id="796b8d04" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

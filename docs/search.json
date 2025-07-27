@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "I’m Simone, a senior economist focused on ad-measurement science.\nThis site collects short explainers, code-backed notes, and longer posts I publish publicly."
+  },
+  {
     "objectID": "posts/2025-07-13-rct-standard-errors/index.html",
     "href": "posts/2025-07-13-rct-standard-errors/index.html",
     "title": "RCT Standard Errors",
@@ -61,5 +68,12 @@
     "title": "RCT Standard Errors",
     "section": "8 Summary of Standard Error and Inference Methods",
     "text": "8 Summary of Standard Error and Inference Methods\nBelow is a summary of the main methods for estimating standard errors or p-values in RCT analysis, with their calculated values (from the code above) and guidance on when to use each. After running the code, copy the printed results into the table below.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nMethod\nWhen to Use\n\n\n\n\nNeyman analytical SE (diff means)\nClassic, large RCTs with simple randomisation; no covariates; outcomes i.i.d.\n\n\nOLS HC3 robust SE (regression)\nAny RCT with covariates; robust to heteroskedasticity; default for most regression analyses\n\n\nOLS Cluster-robust SE (regression)\nAssignment or outcomes clustered (e.g., by school, clinic); regression with covariates\n\n\nBootstrap SE (diff means)\nSmall samples; non-standard estimands (e.g., medians); minimal assumptions\n\n\nBootstrap SE (regression)\nSmall samples; regression with covariates; non-standard estimands; minimal assumptions\n\n\nCluster bootstrap SE (diff means)\nClustered data; small samples; non-standard estimands; minimal assumptions\n\n\nCluster bootstrap SE (regression)\nClustered data; regression with covariates; robust to cluster structure and small samples"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Notes",
+    "section": "",
+    "text": "RCT Standard Errors\n\n\n\nRCT\n\nStandard Errors\n\n\n\nPractical guide to choosing and interpreting standard error methods in RCTs: Neyman, HC3, cluster-robust, bootstrap, and randomisation inference. Includes code, guidance, and when to use each approach.\n\n\n\n\n\nJul 13, 2025\n\n\nSimone\n\n\n\n\n\nNo matching items"
   }
 ]
