@@ -1,0 +1,7 @@
+---
+title: "About"
+description: "What this blog covers and who writes it."
+---
+
+I’m Simone, a senior economist focused on ad-measurement science.  
+This site collects short explainers, code-backed notes, and longer posts I publish publicly.

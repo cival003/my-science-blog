@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Notes"
+  navbar:
+    right:
+      - text: "About"
+        file: about.qmd
+
+format:
+  html:
+    theme: default
+    toc: true
+    code-fold: false
+    math:
+      method: katex
+    number-sections: true
+    numbering: true
+    fig-cap-location: top
+    tbl-cap-location: top
+    css: custom-styles.css
+
+# ---------- key section ----------
+execute:
+  engine: jupyter             # <−− tell Quarto to use Jupyter
+  jupyter: python3            #     and the python3 kernel
+  echo: true                  # show code
+  eval: true                  # run code
+# ---------------------------------

@@ -1,0 +1,9 @@
+.quarto-float-caption,
+.quarto-float-caption-top,
+.quarto-subfloat-caption,
+.quarto-float-tbl,
+.quarto-float-fig,
+figcaption,
+.caption-title {
+    font-weight: bold;
+} 
