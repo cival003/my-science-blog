@@ -1,0 +1,125 @@
+---
+title: "Test Page"
+author: Simone
+date: 2025-07-10
+categories: [Test]
+description: "Test Page"
+draft: true
+---
+
+## Equations
+### Subtitle
+#### Sub-Subtitle
+
+Test page including equations:
+$$
+\hat{\Delta} = \bar Y_T - \bar Y_C .
+$$
+
+
+## Markdows
+
+
+```{markdown}
+import statsmodels.api as sm
+X = sm.add_constant(df[["T", "age", "preY"]])
+model = sm.OLS(df["Y"], X).fit(cov_type="HC3")
+model.summary()
+```
+
+
+## Code Rendering
+
+
+```{python}
+import numpy as np
+import pandas as pd
+x = np.random.normal(loc=0.0, scale=1.0, size=1000)
+y = np.mean(x)
+print(y)
+```
+
+```{python}
+print(np.var(x))
+```
+
+
+## Table
+
+::: {#tbl-panel layout-ncol=2}
+| Col1 | Col2 | Col3 |
+|------|------|------|
+| A    | B    | C    |
+| E    | F    | G    |
+| A    | G    | G    |
+
+: First Panel {#tbl-first}
+
+| Col1 | Col2 | Col3 |
+|------|------|------|
+| A    | B    | C    |
+| E    | F    | G    |
+
+: Second Panel {#tbl-second}
+
+Table Title
+:::
+
+::: {#tbl-test}
+| Col1 | Col2 | Col3 |
+|------|------|------|
+| A    | B    | C    |
+| E    | F    | G    |
+| A    | G    | G    |
+:::
+
+See @tbl-panel for details, especially @tbl-second.
+
+## Plot with Code
+
+
+```{python}
+#| fig-cap: "Fuel efficiency vs. horsepower by origin (with code)"
+import seaborn as sns
+import matplotlib.pyplot as plt
+mpg = sns.load_dataset("mpg").dropna()
+sns.scatterplot(
+    data=mpg,
+    x="horsepower",
+    y="mpg",
+    hue="origin",
+    s=40,
+    alpha=0.8,
+    palette="Dark2"
+)
+plt.xlabel("Horsepower")
+plt.ylabel("Miles per gallon")
+plt.title("Fuel efficiency vs. horsepower")
+plt.tight_layout()
+```
+
+
+## Plot without Source Code
+
+
+```{python}
+#| label: fig-efficiency
+#| fig-cap: "Fuel efficiency vs. horsepower by origin"
+#| echo: false 
+import seaborn as sns
+import matplotlib.pyplot as plt
+mpg = sns.load_dataset("mpg").dropna()
+sns.scatterplot(
+    data=mpg,
+    x="horsepower",
+    y="mpg",
+    hue="origin",
+    s=40,
+    alpha=0.8,
+    palette="Dark2"
+)
+plt.xlabel("Horsepower")
+plt.ylabel("Miles per gallon")
+plt.title("Fuel efficiency vs. horsepower")
+plt.tight_layout()
+```
